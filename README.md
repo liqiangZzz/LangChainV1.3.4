@@ -261,6 +261,7 @@ python -m human_in_the_loop.07_hitl_comprehensive_demo
 - `05_hitl.py`：演示将 HumanInTheLoopMiddleware 作为 guardrail，实现订单金额 >500 时人工审批
 - `06_custom_guardrails_before_agent.py`：自定义 before_agent 中间件，拦截敏感话题
 - `07_custom_guardrails_after_agent.py`：自定义 after_agent 中间件，过滤输出中的敏感信息
+- `08_combine_multi_guardrails_demo.py`：金融客服系统四层安全护栏综合实战，组合 before_agent 关键词过滤、PIIMiddleware 脱敏、HITL 人工审批、after_agent 输出审核
 
 可以从项目根目录按模块��行：
 
