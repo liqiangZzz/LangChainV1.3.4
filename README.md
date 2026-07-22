@@ -11,6 +11,7 @@
 - Pydantic、TypedDict、JSON Schema 等结构化输出
 - 静态提示词、动态提示词和 Agent middleware
 - Guardrails 安全护栏：PII 检测与处理
+- Runtime 运行时与上下文工程
 
 项目中的示例以可直接运行的 Python 脚本为主。公共 DeepSeek 模型实例通过
 LangChain 的 `init_chat_model` 统一入口创建，并集中定义在
@@ -35,6 +36,7 @@ LangChain 的 `init_chat_model` 统一入口创建，并集中定义在
 ├── long_memory/      # Agent 长期记忆、Store 和跨会话偏好示例
 ├── human_in_the_loop/  # Agent 人工介入审批与恢复执行示例
 ├── guardrails/         # Agent 安全护栏：PII 检测与处理示例
+├── runtime_and_context_engineering/  # Runtime 运行时与上下文工程示例
 ├── docs/skills/      # 项目文档维护 skill
 ├── scripts/          # 文档审计与维护辅助脚本
 ├── env_utils.py      # 加载 DeepSeek 和 MySQL 环境变量
@@ -266,6 +268,27 @@ python -m human_in_the_loop.07_hitl_comprehensive_demo
 python -m guardrails.01_redact
 python -m guardrails.03_hash
 python -m guardrails.05_hitl
+```
+
+### Runtime 运行时与上下文工程
+
+`runtime_and_context_engineering/` 演示 Agent 的 Runtime 机制和上下文工程实践：
+
+- `01_runtime_basic.py`：定义 context_schema，在工具中通过 ToolRuntime 读取上下文
+- `02_runtime_in_tools.py`：在工具中通过 runtime.store 访问长期记忆
+- `03_runtime_in_middleware.py`：在 middleware 中通过 Runtime 访问上下文，实现动态提示词
+- `04_runtime_execution_info.py`：通过 runtime.execution_info 获取执行元数据
+- `05_context_engineering_system_prompt.py`：综合 State、Store 和 Context 动态生成系统提示词
+- `06_context_engineering_messages.py`：使用 wrap_model_call 动态注入消息内容
+- `07_context_engineering_tools.py`：使用 wrap_model_call 根据用户角色动态过滤工具
+
+运行示例：
+
+```bash
+python -m runtime_and_context_engineering.01_runtime_basic
+python -m runtime_and_context_engineering.03_runtime_in_middleware
+python -m runtime_and_context_engineering.05_context_engineering_system_prompt
+python -m runtime_and_context_engineering.07_context_engineering_tools
 ```
 
 ### Agent 短期记忆
