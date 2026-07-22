@@ -28,6 +28,13 @@ Guardrails 安全护栏示例包。
 - 07_custom_guardrails_after_agent.py
   演示自定义 after_agent 中间件，在 Agent 执行后检查输出内容并过滤敏感信息。
 
+- 08_combine_multi_guardrails_demo.py
+  综合案例：金融客服系统四层安全护栏实战。演示在银行智能客服场景中组合使用多层护栏：
+  * 第1层（before_agent）：输入关键词过滤，拦截洗钱、诈骗等违规关键词
+  * 第2层（PIIMiddleware）：敏感信息自动脱敏，对身份证号、银行卡号、手机号进行掩码处理
+  * 第3层（HumanInTheLoop）：高危操作人工审批，转账、冻结账户等操作须主管审批
+  * 第4层（after_agent）：输出内容安全审核，用模型对最终回复做合规性兜底检查
+
 运行方式：
 
 - 请从项目根目录使用模块方式运行，例如：
