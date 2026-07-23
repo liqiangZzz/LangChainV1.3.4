@@ -12,6 +12,7 @@
 - 静态提示词、动态提示词和 Agent middleware
 - Guardrails 安全护栏：PII 检测与处理
 - Runtime 运行时与上下文工程
+- MCP Server、MultiServerMCPClient、JWT 认证和工具调用拦截器
 
 项目中的示例以可直接运行的 Python 脚本为主。公共 DeepSeek 模型实例通过
 LangChain 的 `init_chat_model` 统一入口创建，并集中定义在
@@ -37,6 +38,10 @@ LangChain 的 `init_chat_model` 统一入口创建，并集中定义在
 ├── human_in_the_loop/  # Agent 人工介入审批与恢复执行示例
 ├── guardrails/         # Agent 安全护栏：PII 检测与处理示例
 ├── runtime_and_context_engineering/  # Runtime 运行时与上下文工程示例
+├── mcp_part/         # MCP Server、Client、JWT 认证与拦截器示例
+│   ├── 01_quick_start/  # stdio、HTTP 和多 MCP Server 快速开始
+│   ├── 02_mcp_oauth/    # RSA/JWT 凭据和 Bearer Token 认证示例
+│   └── 03_interceptor/  # MCP 工具调用拦截器专题
 ├── docs/skills/      # 项目文档维护 skill
 ├── scripts/          # 文档审计与维护辅助脚本
 ├── env_utils.py      # 加载 DeepSeek 和 MySQL 环境变量
@@ -50,7 +55,14 @@ LangChain 的 `init_chat_model` 统一入口创建，并集中定义在
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install langchain langchain-deepseek langchain-openai python-dotenv pydantic
+pip install \
+  langchain \
+  langchain-deepseek \
+  langchain-openai \
+  langchain-mcp-adapters \
+  fastmcp \
+  python-dotenv \
+  pydantic
 ```
 
 如果要运行 MySQL checkpoint 示例，还需要安装：
@@ -71,6 +83,14 @@ DEEPSEEK_BASE_URL=DeepSeek API Base URL
 
 # 仅运行 MySQL 记忆示例时需要
 MYSQL_DATABASE_URL=mysql://langchain_user:你的密码@localhost:3306/langchain_db
+
+# 仅运行 MCP JWT 认证拦截器示例时需要
+MCP_JWT_PUBLIC_KEY=本地生成的 RSA 公钥
+MCP_ACCESS_TOKEN=本地生成的 JWT
+
+# 仅运行 MCP 基础 JWT 认证示例时需要
+MCP_OAUTH_JWT_PUBLIC_KEY=本地生成的 RSA 公钥
+MCP_OAUTH_ACCESS_TOKEN=本地生成的 JWT
 ```
 
 也可以复制 `.env.example` 后再填入真实值。
@@ -96,6 +116,14 @@ python -m agents.agent_structured_output.01_pydantic_tool_strategy
 python -m agents.tool_creation.01_create_tool
 python -m agents.tool_call_error_handling.01_generic_tool_error_handler
 python -m human_in_the_loop.01_human_in_the_loop_middleware
+```
+
+运行 MCP HTTP 示例时，需要先在一个终端启动对应 Server，再在另一个终端启动 Client。
+例如运行基础多服务示例：
+
+```bash
+python mcp_part/01_quick_start/weather_server.py
+python mcp_part/01_quick_start/mcp_demo.py
 ```
 
 ## 学习模块
@@ -292,6 +320,36 @@ python -m runtime_and_context_engineering.05_context_engineering_system_prompt
 python -m runtime_and_context_engineering.07_context_engineering_tools
 ```
 
+### Model Context Protocol（MCP）
+
+`mcp_part/` 演示使用 FastMCP 创建 MCP Server，并通过
+`langchain-mcp-adapters` 把远程工具接入 LangChain Agent：
+
+- `01_quick_start/`：组合 stdio 数学服务和 HTTP 天气服务，使用
+  `MultiServerMCPClient` 统一加载多个 MCP Server 的工具
+- `02_mcp_oauth/`：演示 RSA 密钥、JWT、Bearer Token 和 JWTVerifier 配置
+- `03_interceptor/01_interceptor_quick_start/`：记录工具调用日志，并演示多个拦截器
+  的洋葱式执行顺序
+- `03_interceptor/02_interceptor_inject_context/`：从 Agent runtime context 读取共享
+  JWT，动态注入 HTTP Header，并由 MCP Server 验签
+- `03_interceptor/03_interceptor_read_store/`：从 runtime.store 读取用户偏好并改写
+  MCP 工具参数
+- `03_interceptor/04_interceptor_update_state/`：将 MCP 结果转换为 ToolMessage，
+  使用 Command 更新自定义 AgentState 或结束执行
+
+运行 JWT 认证拦截器示例：
+
+```bash
+# 1. 生成本地临时公钥和 JWT，并把输出复制到 .env
+python mcp_part/03_interceptor/02_interceptor_inject_context/generate_agent_credentials.py
+
+# 2. 先启动 MCP Server
+python mcp_part/03_interceptor/02_interceptor_inject_context/order_server.py
+
+# 3. 再运行共享同一 MCP Server 的多个 Agent
+python mcp_part/03_interceptor/02_interceptor_inject_context/interceptor_context_demo.py
+```
+
 ### Agent 短期记忆
 
 `short_memory/` 演示 Agent 如何通过 checkpointer 保存同一会话中的消息状态：
@@ -340,6 +398,11 @@ python -m runtime_and_context_engineering.07_context_engineering_tools
   会增加 API 调用次数和 token 消耗。
 - `long_memory/03_long_memory_in_db.py` 和 `long_memory/05_short_and_long_memory_demo.py`
   会连接 MySQL，并分别写入 checkpoint 和 store 表相关数据。
+- `mcp_part/` 的 HTTP 客户端需要先启动对应 MCP Server；多个 Server 示例默认使用
+  8000 端口，不要同时占用同一端口。
+- MCP Client 示例会调用真实 DeepSeek 模型；工具调用可能产生多轮模型请求。
+- `generate_agent_credentials.py` 生成的公钥和 JWT 仅用于本地学习，每次重新生成后必须
+  成套更新 `.env`，不要把真实 Token、私钥或包含凭据的日志提交到仓库。
 - 清空 MySQL checkpoint 时，不要只删除 `checkpoint_migrations` 的数据；如果要完全重置，
   请删除 checkpoint 相关表后让示例重新创建表结构。
 - 示例中的天气、股票价格和新闻等工具返回模拟数据，不代表真实外部查询结果。
