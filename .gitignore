@@ -12,6 +12,7 @@ venv/
 env/
 .venv/
 ENV/
+.env
 
 # 其他常见忽略
 *.log
