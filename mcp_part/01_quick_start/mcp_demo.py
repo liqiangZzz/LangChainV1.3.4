@@ -1,14 +1,9 @@
 import asyncio
-import sys
-from pathlib import Path
 
 from langchain.agents import create_agent
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
 from models.init_chat_model.init_chat_model_llm import deepseek_llm
-
-
-MATH_SERVER_PATH = Path(__file__).with_name("math_server.py")
 
 
 async def main():
@@ -19,8 +14,8 @@ async def main():
             # stdio 本地进程
             "math_server":{
                 "transport": "stdio",
-                "command": sys.executable,
-                "args": [str(MATH_SERVER_PATH)],
+                "command": "/opt/miniconda3/envs/langchain_v1.3.4/bin/python",
+                "args": ["/Users/Python/project/project-learn/pythod_code/LangChainV1.3.4/mcp_part/01_quick_start/math_server.py"],
                 "env": {
                     "PYTHONIOENCODING": "utf-8",
                 }

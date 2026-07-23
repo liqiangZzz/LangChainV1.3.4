@@ -7,7 +7,7 @@ MCP 拦截器注入运行时认证上下文示例包。
 主要文件：
 
 - generate_agent_credentials.py
-  为本地示例生成临时 RSA 公钥和一小时有效期的共享 JWT。
+  为本地示例生成临时 RSA 公钥和 24 小时有效期的共享 JWT。
 
 - interceptor_context_demo.py
   创建查询和退款两个 Agent，共用 MCP 工具，并从 runtime context 动态注入 JWT。

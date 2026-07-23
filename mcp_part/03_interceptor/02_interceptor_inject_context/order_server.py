@@ -14,7 +14,7 @@ auth = JWTVerifier(
     # 同时兼容 .env 中保存的真实换行和字面量 \n。
     public_key=MCP_JWT_PUBLIC_KEY.replace("\\n", "\n"),
     issuer="my_company_auth_server",
-    audience="order_mcp_server",
+    audience="langchain_mcp_examples",
     algorithm="RS256",
 )
 

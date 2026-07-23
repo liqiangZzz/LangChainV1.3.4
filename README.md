@@ -87,10 +87,6 @@ MYSQL_DATABASE_URL=mysql://langchain_user:你的密码@localhost:3306/langchain_
 # 仅运行 MCP JWT 认证拦截器示例时需要
 MCP_JWT_PUBLIC_KEY=本地生成的 RSA 公钥
 MCP_ACCESS_TOKEN=本地生成的 JWT
-
-# 仅运行 MCP 基础 JWT 认证示例时需要
-MCP_OAUTH_JWT_PUBLIC_KEY=本地生成的 RSA 公钥
-MCP_OAUTH_ACCESS_TOKEN=本地生成的 JWT
 ```
 
 也可以复制 `.env.example` 后再填入真实值。

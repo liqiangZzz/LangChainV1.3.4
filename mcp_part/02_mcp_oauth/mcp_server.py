@@ -1,21 +1,20 @@
 from fastmcp import FastMCP
 from fastmcp.server.auth.providers.jwt import JWTVerifier
 
-from env_utils import MCP_OAUTH_JWT_PUBLIC_KEY
+from env_utils import MCP_JWT_PUBLIC_KEY
 
 
-if not MCP_OAUTH_JWT_PUBLIC_KEY:
-    raise RuntimeError("请先配置 MCP_OAUTH_JWT_PUBLIC_KEY")
+if not MCP_JWT_PUBLIC_KEY:
+    raise RuntimeError("请先配置 MCP_JWT_PUBLIC_KEY")
 
-# MCP Server 使用公钥验证 JWT Token。
 auth = JWTVerifier(
-    public_key=MCP_OAUTH_JWT_PUBLIC_KEY.replace("\\n", "\n"),
+    public_key=MCP_JWT_PUBLIC_KEY.replace("\\n", "\n"),
     issuer="my_company_auth_server",
-    audience="internal_mcp_server",
+    audience="langchain_mcp_examples",
     algorithm="RS256"
 )
 
-# 将 verifier 绑定到 FastMCP 后，未认证请求会在工具执行前被拒绝。
+# 必须把 verifier 绑定到 FastMCP，认证才会真正生效。
 mcp = FastMCP("internal_mcp_server", auth=auth)
 
 # 模拟数据

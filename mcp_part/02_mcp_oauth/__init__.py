@@ -7,7 +7,7 @@ MCP JWT 认证示例包。
 主要文件：
 
 - gen_token.py
-  生成临时 RSA 密钥对和一小时有效期的 JWT，输出可复制到 .env 的公钥和访问 Token。
+  生成临时 RSA 公钥和 24 小时有效期的 JWT，供两个认证示例共用。
 
 - mcp_server.py
   定义员工和部门预算工具，并把 JWTVerifier 绑定到 FastMCP Server。

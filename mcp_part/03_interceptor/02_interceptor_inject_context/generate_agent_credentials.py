@@ -8,7 +8,7 @@ from fastmcp.server.auth.providers.jwt import RSAKeyPair
 
 # JWT 的签发方和接收方必须与 MCP Server 中 JWTVerifier 的配置完全一致。
 ISSUER = "my_company_auth_server"
-AUDIENCE = "order_mcp_server"
+AUDIENCE = "langchain_mcp_examples"
 
 
 def create_token(
@@ -21,7 +21,7 @@ def create_token(
         subject=subject,
         issuer=ISSUER,
         audience=AUDIENCE,
-        expires_in_seconds=3600,
+        expires_in_seconds=24 * 60 * 60,
     )
 
 
