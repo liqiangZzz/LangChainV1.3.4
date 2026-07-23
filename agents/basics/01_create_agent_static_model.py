@@ -28,7 +28,7 @@ def get_weather(city: str):
 # =====================================================================
 
 deepseek_llm = init_chat_model(
-    model="DeepSeek-V4-Flash",
+    model="deepseek-v4-flash",
     model_provider="deepseek",
     api_key=DEEPSEEK_API_KEY,
     api_base=DEEPSEEK_BASE_URL,

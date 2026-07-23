@@ -14,7 +14,7 @@ from env_utils import DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, GLM_API_KEY, GLM_BASE
 # =====================================================================
 
 deepseek_llm: BaseChatModel = init_chat_model(
-    model="DeepSeek-V4-Flash",
+    model="deepseek-v4-flash",
     model_provider="deepseek",
     api_key=DEEPSEEK_API_KEY,
     # api_base 是 ChatDeepSeek 的原生服务地址字段。
