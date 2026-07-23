@@ -5,7 +5,9 @@ from fastmcp.server.auth.providers.jwt import RSAKeyPair
 key_pair = RSAKeyPair.generate()
 
 # 私钥只在当前进程内用于签名，不输出或交给 MCP Client。
-public_key = key_pair.public_key.replace("\n", "\\n")
+public_key = key_pair.public_key
+
+
 jwt_token = key_pair.create_token(
     # Token 的主体（Agent 名称）。
     subject="my_agent",
