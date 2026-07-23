@@ -40,3 +40,13 @@ GLM_BASE_URL = os.getenv('GLM_BASE_URL')
 # =====================================================================
 # MySQL 数据库连接地址
 MYSQL_DATABASE_URL = os.getenv('MYSQL_DATABASE_URL')
+
+# =====================================================================
+# 4. MCP 认证配置
+# =====================================================================
+# 公钥由 MCP Server 用于验签，多个 Agent 共用同一个访问 Token。
+MCP_JWT_PUBLIC_KEY = os.getenv("MCP_JWT_PUBLIC_KEY")
+MCP_ACCESS_TOKEN = os.getenv("MCP_ACCESS_TOKEN")
+# 基础 JWT 认证示例使用独立凭据，避免与订单拦截器示例的 audience 混用。
+MCP_OAUTH_JWT_PUBLIC_KEY = os.getenv("MCP_OAUTH_JWT_PUBLIC_KEY")
+MCP_OAUTH_ACCESS_TOKEN = os.getenv("MCP_OAUTH_ACCESS_TOKEN")
