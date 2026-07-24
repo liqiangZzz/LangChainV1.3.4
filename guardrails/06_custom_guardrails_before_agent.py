@@ -5,7 +5,7 @@ from langchain.agents.middleware import before_agent
 from langchain_core.tools import tool
 from langgraph.runtime import Runtime
 
-from models.init_chat_model.init_chat_model_llm import deepseek_llm, glm_llm
+from models.init_chat_model.init_chat_model_llm import deepseek_llm
 
 BANNED_KEYWORDS = ["暴力", "枪支", "毒品", "色情", "赌博"]
 
