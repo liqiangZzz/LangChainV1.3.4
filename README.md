@@ -12,7 +12,8 @@
 - 静态提示词、动态提示词和 Agent middleware
 - Guardrails 安全护栏：PII 检测与处理
 - Runtime 运行时与上下文工程
-- MCP Server、MultiServerMCPClient、JWT 认证和工具调用拦截器
+- MCP Server、MultiServerMCPClient、JWT 认证、工具调用拦截器、异常处理、
+  Resource 和 Prompt
 
 项目中的示例以可直接运行的 Python 脚本为主。公共 DeepSeek 模型实例通过
 LangChain 的 `init_chat_model` 统一入口创建，并集中定义在
@@ -38,10 +39,12 @@ LangChain 的 `init_chat_model` 统一入口创建，并集中定义在
 ├── human_in_the_loop/  # Agent 人工介入审批与恢复执行示例
 ├── guardrails/         # Agent 安全护栏：PII 检测与处理示例
 ├── runtime_and_context_engineering/  # Runtime 运行时与上下文工程示例
-├── mcp_part/         # MCP Server、Client、JWT 认证与拦截器示例
+├── mcp_part/         # MCP Server、Client、认证、拦截器及能力组合示例
 │   ├── 01_quick_start/  # stdio、HTTP 和多 MCP Server 快速开始
 │   ├── 02_mcp_oauth/    # RSA/JWT 凭据和 Bearer Token 认证示例
-│   └── 03_interceptor/  # MCP 工具调用拦截器专题
+│   ├── 03_interceptor/  # MCP 工具调用拦截器专题
+│   ├── 04_handler_tool_error/  # MCP 工具异常传递和 Agent 重试示例
+│   └── 05_resources_and_prompt/  # MCP Tool、Resource 和 Prompt 综合示例
 ├── docs/skills/      # 项目文档维护 skill
 ├── scripts/          # 文档审计与维护辅助脚本
 ├── env_utils.py      # 加载 DeepSeek 和 MySQL 环境变量
@@ -332,6 +335,10 @@ python -m runtime_and_context_engineering.07_context_engineering_tools
   MCP 工具参数
 - `03_interceptor/04_interceptor_update_state/`：将 MCP 结果转换为 ToolMessage，
   使用 Command 更新自定义 AgentState 或结束执行
+- `04_handler_tool_error/`：模拟业务异常和数据库连接超时，演示默认工具错误处理
+  以及 Agent 在限定次数内重试
+- `05_resources_and_prompt/`：通过股票研究场景组合 Tool、Resource 和 Prompt；
+  Resource 提供只读参考上下文，Prompt 提供任务模板，Tool 由 Agent 按需调用
 
 运行 JWT 认证拦截器示例：
 
@@ -345,6 +352,29 @@ python mcp_part/03_interceptor/02_interceptor_inject_context/order_server.py
 # 3. 再运行共享同一 MCP Server 的多个 Agent
 python mcp_part/03_interceptor/02_interceptor_inject_context/interceptor_context_demo.py
 ```
+
+运行 MCP 工具异常处理示例：
+
+```bash
+# 终端一：启动会模拟业务异常和瞬时故障的 MCP Server
+python -m mcp_part.04_handler_tool_error.error_server
+
+# 终端二：运行带有限次重试指令的 Agent
+python -m mcp_part.04_handler_tool_error.retry_demo
+```
+
+运行 MCP Tool、Resource 和 Prompt 综合示例：
+
+```bash
+# 终端一：启动股票 MCP Server
+python -m mcp_part.05_resources_and_prompt.stock_server
+
+# 终端二：读取资源和 Prompt，并由 Agent 按需调用股票工具
+python -m mcp_part.05_resources_and_prompt.stock_research_client
+```
+
+上述两个客户端都会调用真实 DeepSeek 模型并消耗 API 额度。工具异常示例可能发生
+多轮重试；股票示例中的行情和市场概览均为本地模拟数据，不构成投资建议。
 
 ### Agent 短期记忆
 

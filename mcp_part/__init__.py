@@ -2,7 +2,8 @@
 Model Context Protocol（MCP）学习示例包。
 
 本包演示使用 FastMCP 创建服务端工具，并通过 langchain-mcp-adapters 将一个或多个
-MCP Server 的工具接入 LangChain Agent。内容覆盖基础通信、JWT 认证和工具调用拦截器。
+MCP Server 的能力接入 LangChain Agent。内容覆盖基础通信、JWT 认证、工具调用拦截器、
+工具异常处理，以及 Tool、Resource 与 Prompt 的组合使用。
 
 子包说明：
 
@@ -15,11 +16,19 @@ MCP Server 的工具接入 LangChain Agent。内容覆盖基础通信、JWT 认�
 - 03_interceptor
   演示 MCP 工具调用拦截器的日志、组合、运行时上下文注入、Store 读取和状态更新。
 
+- 04_handler_tool_error
+  演示 MCP 工具业务异常和瞬时故障的传递，以及 Agent 在限定次数内重试工具调用。
+
+- 05_resources_and_prompt
+  演示 MCP Tool、Resource 和 Prompt 在股票研究 Agent 中的职责划分与组合流程。
+
 运行注意事项：
 
 - 客户端示例会调用真实 DeepSeek 模型并消耗 API 额度。
+- 工具异常处理示例可能触发多轮模型和工具重试，额度消耗会相应增加。
 - HTTP 示例需要先启动对应 MCP Server，再运行客户端脚本；多个示例默认使用 8000 端口，
   应分别运行，避免端口冲突。
+- 股票研究示例使用本地模拟数据，不构成真实行情或投资建议。
 - JWT、公钥和访问 Token 示例仅用于本地学习，真实凭据不得提交到仓库。
 - 本包的 __init__.py 只提供说明，不导入示例模块。
 """
