@@ -19,7 +19,9 @@ def create_token(
     return key_pair.create_token(
         # sub 用于标识通过认证的调用主体。
         subject=subject,
+        # 签发方的标识,Server验证token的时候会验证
         issuer=ISSUER,
+        # 接收方的标识,Server验证token的时候会验证
         audience=AUDIENCE,
         expires_in_seconds=24 * 60 * 60,
     )

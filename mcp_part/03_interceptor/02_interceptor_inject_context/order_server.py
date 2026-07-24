@@ -4,7 +4,6 @@ from fastmcp.server.dependencies import get_access_token
 
 from env_utils import MCP_JWT_PUBLIC_KEY
 
-
 if not MCP_JWT_PUBLIC_KEY:
     raise RuntimeError("请先配置 MCP_JWT_PUBLIC_KEY")
 
