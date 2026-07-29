@@ -13,7 +13,7 @@
 - Guardrails 安全护栏：PII 检测与处理
 - Runtime 运行时与上下文工程
 - MCP Server、MultiServerMCPClient、JWT 认证、工具调用拦截器、异常处理、
-  Resource 和 Prompt
+  Resource、Prompt、通知、日志、进度和 Elicitation
 
 项目中的示例以可直接运行的 Python 脚本为主。公共 DeepSeek 模型实例通过
 LangChain 的 `init_chat_model` 统一入口创建，并集中定义在
@@ -44,7 +44,10 @@ LangChain 的 `init_chat_model` 统一入口创建，并集中定义在
 │   ├── 02_mcp_oauth/    # RSA/JWT 凭据和 Bearer Token 认证示例
 │   ├── 03_interceptor/  # MCP 工具调用拦截器专题
 │   ├── 04_handler_tool_error/  # MCP 工具异常传递和 Agent 重试示例
-│   └── 05_resources_and_prompt/  # MCP Tool、Resource 和 Prompt 综合示例
+│   ├── 05_resources_and_prompt/  # MCP Tool、Resource 和 Prompt 综合示例
+│   ├── 06_notification_and_logs/  # MCP 日志、进度通知和 Client Callbacks 示例
+│   ├── 07_elicitation/  # MCP Elicitation 用户补充输入示例
+│   └── 08_comprehensive_example/  # MCP 电商售后综合示例
 ├── docs/skills/      # 项目文档维护 skill
 ├── scripts/          # 文档审计与维护辅助脚本
 ├── env_utils.py      # 加载 DeepSeek 和 MySQL 环境变量
@@ -339,6 +342,12 @@ python -m runtime_and_context_engineering.07_context_engineering_tools
   以及 Agent 在限定次数内重试
 - `05_resources_and_prompt/`：通过股票研究场景组合 Tool、Resource 和 Prompt；
   Resource 提供只读参考上下文，Prompt 提供任务模板，Tool 由 Agent 按需调用
+- `06_notification_and_logs/`：在模拟数据导入过程中发送不同级别的日志和进度通知，
+  并通过 Client Callbacks 实时接收
+- `07_elicitation/`：通过文件冲突场景暂停工具调用，向用户请求覆盖、跳过或取消选择，
+  并处理 accept、decline 和 cancel
+- `08_comprehensive_example/`：通过电商售后场景组合两个 MCP Server、Tool、Resource、
+  Prompt、拦截器、自定义 AgentState、HITL、日志、进度和 Elicitation
 
 运行 JWT 认证拦截器示例：
 
@@ -373,8 +382,42 @@ python -m mcp_part.05_resources_and_prompt.stock_server
 python -m mcp_part.05_resources_and_prompt.stock_research_client
 ```
 
-上述两个客户端都会调用真实 DeepSeek 模型并消耗 API 额度。工具异常示例可能发生
-多轮重试；股票示例中的行情和市场概览均为本地模拟数据，不构成投资建议。
+运行 MCP 日志与进度通知示例：
+
+```bash
+# 终端一：启动模拟数据导入服务
+python -m mcp_part.06_notification_and_logs.data_server
+
+# 终端二：运行带日志和进度回调的 Agent
+python -m mcp_part.06_notification_and_logs.import_demo
+```
+
+运行 MCP Elicitation 示例：
+
+```bash
+# 终端一：启动文件导入服务
+python -m mcp_part.07_elicitation.import_server
+
+# 终端二：运行可处理用户补充输入的 Agent
+python -m mcp_part.07_elicitation.import_demo
+```
+
+运行电商售后综合示例：
+
+```bash
+# 终端一：启动订单服务（8010 端口）
+python -m mcp_part.08_comprehensive_example.order_server
+
+# 终端二：启动通知服务（8020 端口）
+python -m mcp_part.08_comprehensive_example.notify_server
+
+# 终端三：运行售后 Agent
+python -m mcp_part.08_comprehensive_example.after_sale_agent
+```
+
+上述 MCP 客户端都会调用真实 DeepSeek 模型并消耗 API 额度。工具异常示例可能发生
+多轮重试；Elicitation 与售后综合示例需要交互式终端输入；股票行情、文件导入、
+订单退款和短信发送均为本地模拟，不代表真实外部操作。
 
 ### Agent 短期记忆
 
@@ -424,9 +467,11 @@ python -m mcp_part.05_resources_and_prompt.stock_research_client
   会增加 API 调用次数和 token 消耗。
 - `long_memory/03_long_memory_in_db.py` 和 `long_memory/05_short_and_long_memory_demo.py`
   会连接 MySQL，并分别写入 checkpoint 和 store 表相关数据。
-- `mcp_part/` 的 HTTP 客户端需要先启动对应 MCP Server；多个 Server 示例默认使用
-  8000 端口，不要同时占用同一端口。
+- `mcp_part/` 的 HTTP 客户端需要先启动对应 MCP Server；多数示例默认使用 8000
+  端口，应分别运行以避免冲突；售后综合示例使用 8010 和 8020 端口。
 - MCP Client 示例会调用真实 DeepSeek 模型；工具调用可能产生多轮模型请求。
+- `07_elicitation/` 和 `08_comprehensive_example/` 在用户确认环节会等待终端输入，
+  需要在交互式终端中运行。
 - `generate_agent_credentials.py` 生成的公钥和 JWT 仅用于本地学习，每次重新生成后必须
   成套更新 `.env`，不要把真实 Token、私钥或包含凭据的日志提交到仓库。
 - 清空 MySQL checkpoint 时，不要只删除 `checkpoint_migrations` 的数据；如果要完全重置，
