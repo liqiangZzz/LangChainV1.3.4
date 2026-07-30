@@ -64,7 +64,12 @@ MARKET_DATA = [
 
 @mcp.resource("market://overview/{sector}", mime_type="application/json", description="当前股票市场概览")
 async def get_market_overview(sector: str):
-    """获取当前股票市场概览。 sector 就是路径参数"""
+    """获取当前股票市场概览。
+     Args：
+        sector: 行业名称
+     Returns：
+        JSON格式的市场概览
+     """
     filtered_data = [data for data in MARKET_DATA if data["sector"] == sector]
     return json.dumps(filtered_data, ensure_ascii=False)
 

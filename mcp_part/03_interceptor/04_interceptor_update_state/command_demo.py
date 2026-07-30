@@ -70,20 +70,21 @@ async def main():
     )
 
     result1 = await agent.ainvoke({
-
         "messages": [{
             "role": "user",
             "content": "给我查询订单ORD-001的状态"
-        }], "user_id": "u_001"
-    }, )
+        }], "user_id": "u_001"})
 
     print("result1", result1)
     print(result1["messages"][-1].content)
     print(f"用户{result1.get('user_id')},最后操作时间:", result1.get("last_op_time"))
     print("-----------------")
 
-    result2 = await agent.ainvoke(
-        {"messages": [{"role": "user", "content": "ORD-002给我退款"}], "user_id": "u_002"})
+    result2 = await agent.ainvoke({
+        "messages": [{
+            "role": "user",
+            "content": "ORD-002给我退款"
+        }], "user_id": "u_002"})
 
     print("result2", result2)
     print(result2["messages"][-1].content)
